@@ -11,8 +11,11 @@ const unsigned int WIDTH = 800;
 const unsigned int HEIGHT = 800;
 const unsigned int ITERATIONS = 40;
 const unsigned int THRESHHOLD = 500;
+const double X_COORD = -0.5;
+const double Y_COORD = 0;
+const double ZOOM = 4.0;
 
-int mandlebrot(int x, int y);
+int* mandlebrot(int x, int y);
 
 int main()
 {
@@ -47,12 +50,9 @@ int main()
 
 		for (register int x = 0; x < W; x += 1) {
 			for (register int y = 0; y < H; y += 1) {
-				/*pixels[x * y * 4] = mandlebrot(x, y);
-				pixels[x * y * 4 + 1] = mandlebrot(x, y);
-				pixels[x * y * 4 + 2] = mandlebrot(x, y);*/
-				pixels[(y * H + x) * 4] = mandlebrot(x, y);
-				pixels[(y * H + x) * 4 + 1] = 0;
-				pixels[(y * H + x) * 4 + 2] = 0;
+				pixels[(y * H + x) * 4] = mandlebrot(x, y)[0];
+				pixels[(y * H + x) * 4 + 1] = mandlebrot(x, y)[1];
+				pixels[(y * H + x) * 4 + 2] = mandlebrot(x, y)[2];
 				pixels[(y * H + x) * 4 + 3] = 255;
 			}
 		}
@@ -69,15 +69,18 @@ int main()
     return 0;
 }
 
-int mandlebrot(int x, int y) {
+int* mandlebrot(int x, int y) {
 
-    complex<double> z(0.0, 0.0);
-    complex<double> c((double(x) / WIDTH - 0.5) * 4, (double(y) / HEIGHT - 0.5) * 4);
-    for (int i = 0; i < ITERATIONS; i++) {
-        z = pow(z, 2) + c;
-        if (abs(z) > THRESHHOLD) {
-            return int(float(i)/ITERATIONS*255);
-        }
-    }
-    return 0;
+	int color[3] = { 0, 0, 0 };
+
+	complex<double> z(0.0, 0.0);
+	complex<double> c((double(x) / WIDTH - 0.5 + X_COORD) * 4.0 / ZOOM, (double(y) / HEIGHT - 0.5 + Y_COORD) * 4.0 / ZOOM);
+	for (int i = 0; i < ITERATIONS; i++) {
+		z = pow(z, 2) + c;
+		if (abs(z) > THRESHHOLD) {
+			color[0] = float(i) / ITERATIONS * 255;
+			return color;
+		}
+	}
+	return color;
 }
